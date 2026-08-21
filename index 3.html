@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clock</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+html,body{margin:0;padding:0;background:transparent}
+.clock{color:#1f1f1f;font-family:"DotGothic16",sans-serif;text-align:left}
+.date{font-size:16px;letter-spacing:.04em}
+.time-row{display:flex;align-items:baseline;gap:10px}
+.time{font-size:30px;line-height:1.2}
+.greeting{font-size:15px;font-style:italic;margin-bottom:8px}
+.timezone{font-family:"DotGothic16",sans-serif;font-size:12px;background:transparent;border:0;color:#1f1f1f;padding:0;margin:0;cursor:pointer;outline:none}
+.timezone:hover{opacity:.6}
+.timezone option{font-family:sans-serif;color:#1f1f1f;background:white}
+</style>
+</head>
+<body>
+<div class="clock">
+<div class="date" id="date"></div>
+<div class="time-row"><div class="time" id="time"></div><select class="timezone" id="timezone" aria-label="UTC offset"></select></div>
+<div class="greeting" id="greeting"></div>
+</div>
+<script>
+const timezoneSelect=document.getElementById("timezone");
+for(let offset=-12;offset<=14;offset++){
+ const option=document.createElement("option");
+ option.textContent=offset===0?"UTC ±0":offset>0?`UTC +${offset}`:`UTC ${offset}`;
+ option.value=offset;
+ timezoneSelect.appendChild(option);
+}
+timezoneSelect.value="-4";
+
+function updateClock(){
+ const offset=Number(timezoneSelect.value), now=new Date();
+ const utcTime=now.getTime()+now.getTimezoneOffset()*60000;
+ const selectedTime=new Date(utcTime+offset*3600000);
+
+ document.getElementById("date").textContent=selectedTime.toLocaleDateString("en-US",{
+   weekday:"long",month:"long",day:"numeric"
+ }).toUpperCase();
+
+ document.getElementById("time").textContent=selectedTime.toLocaleTimeString("en-US",{
+   hour:"numeric",minute:"2-digit",hour12:true
+ });
+
+ const minutes=selectedTime.getHours()*60+selectedTime.getMinutes();
+ let greeting;
+ if(minutes>=300&&minutes<720) greeting="Good morning, Victoria.";
+ else if(minutes>=720&&minutes<1020) greeting="Good afternoon, Victoria.";
+ else if(minutes>=1020&&minutes<1350) greeting="Good evening, Victoria.";
+ else greeting="zzzzzzzzzz...";
+ document.getElementById("greeting").textContent=greeting;
+}
+updateClock();
+setInterval(updateClock,1000);
+timezoneSelect.addEventListener("change",updateClock);
+</script>
+</body>
+</html>
