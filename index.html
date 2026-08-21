@@ -81,16 +81,17 @@
       minute: "2-digit"
     }).format(now);
 
-    const hour = now.getHours();
+const minutes = now.getHours() * 60 + now.getMinutes();
 
-    if (hour >= 5 && hour < 12) {
-      greetingEl.textContent = "Good morning, Victoria.";
-    } else if (hour >= 12 && hour < 17) {
-      greetingEl.textContent = "Good afternoon, Victoria.";
-    } else {
-      greetingEl.textContent = "Good evening, Victoria.";
-    }
-  }
+if (minutes >= 300 && minutes < 720) {
+  greetingEl.textContent = "Good morning, Victoria.";
+} else if (minutes >= 720 && minutes < 1020) {
+  greetingEl.textContent = "Good afternoon, Victoria.";
+} else if (minutes >= 1020 && minutes < 1350) {
+  greetingEl.textContent = "Good evening, Victoria.";
+} else {
+  greetingEl.textContent = "zzzzzzzzzz...";
+}
 
   updateClock();
   setInterval(updateClock, 1000);
