@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victoria's Clock</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+html,body{margin:0;padding:0;background:transparent}
+.clock{color:#1f1f1f;font-family:"DotGothic16",sans-serif;text-align:left}
+.date{font-size:16px;letter-spacing:.04em}
+.time{font-size:30px;line-height:1.2}
+.greeting{font-size:15px;font-style:italic;margin-top:1px;min-height:19px;white-space:nowrap}
+.timezone{display:block;margin-top:78px;font-family:"DotGothic16",sans-serif;font-size:12px;background:transparent;border:0;color:#1f1f1f;padding:0;cursor:pointer;outline:none}
+.timezone:hover{opacity:.6}
+.timezone option{font-family:sans-serif;color:#1f1f1f;background:white}
+</style>
+</head>
+<body>
+<div class="clock">
+  <div class="date" id="date"></div>
+  <div class="time" id="time"></div>
+  <div class="greeting" id="greeting"></div>
+  <select class="timezone" id="timezone" aria-label="UTC offset"></select>
+</div>
+<script>
+const timezoneSelect=document.getElementById("timezone");
+const greetingEl=document.getElementById("greeting");
+
+for(let offset=-12;offset<=14;offset++){
+  const option=document.createElement("option");
+  option.value=offset;
+  option.textContent=offset===0?"UTC ±0":offset>0?`UTC +${offset}`:`UTC ${offset}`;
+  timezoneSelect.appendChild(option);
+}
+
+const savedOffset=localStorage.getItem("victoriaClockOffset");
+timezoneSelect.value=savedOffset!==null?savedOffset:"-4";
+
+let typingTimer=null;
+let isSleeping=false;
+
+function startSleepTyping(){
+  if(isSleeping) return;
+  isSleeping=true;
+
+  let count=0;
+  const max=24;
+  const speed=230;
+  const pause=1000;
+
+  function typeNext(){
+    if(!isSleeping) return;
+
+    count++;
+    greetingEl.textContent="z".repeat(count)+"...";
+
+    if(count>=max){
+      typingTimer=setTimeout(()=>{
+        if(!isSleeping) return;
+        count=0;
+        typeNext();
+      },pause);
+    }else{
+      typingTimer=setTimeout(typeNext,speed);
+    }
+  }
+
+  typeNext();
+}
+
+function stopSleepTyping(){
+  isSleeping=false;
+  if(typingTimer){
+    clearTimeout(typingTimer);
+    typingTimer=null;
+  }
+}
+
+function updateClock(){
+  const offset=Number(timezoneSelect.value);
+  const now=new Date();
+  const utcTime=now.getTime()+now.getTimezoneOffset()*60000;
+  const selectedTime=new Date(utcTime+offset*3600000);
+
+  document.getElementById("date").textContent=selectedTime.toLocaleDateString("en-US",{
+    weekday:"long",month:"long",day:"numeric"
+  }).toUpperCase();
+
+  document.getElementById("time").textContent=selectedTime.toLocaleTimeString("en-US",{
+    hour:"numeric",minute:"2-digit",hour12:true
+  });
+
+  const minutes=selectedTime.getHours()*60+selectedTime.getMinutes();
+
+  if(minutes>=300 && minutes<720){
+    stopSleepTyping();
+    greetingEl.textContent="Good morning, Victoria.";
+  }else if(minutes>=720 && minutes<1020){
+    stopSleepTyping();
+    greetingEl.textContent="Good afternoon, Victoria.";
+  }else if(minutes>=1020 && minutes<1350){
+    stopSleepTyping();
+    greetingEl.textContent="Good evening, Victoria.";
+  }else{
+    startSleepTyping();
+  }
+}
+
+timezoneSelect.addEventListener("change",()=>{
+  localStorage.setItem("victoriaClockOffset",timezoneSelect.value);
+  stopSleepTyping();
+  updateClock();
+});
+
+updateClock();
+setInterval(updateClock,1000);
+</script>
+</body>
+</html>
