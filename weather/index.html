@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NYC Weather</title>
+<title>WV Weather</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
@@ -51,9 +51,9 @@
 </style>
 </head>
 <body>
-  <main class="weather" aria-label="New York City current weather">
+  <main class="weather" aria-label="WV current weather">
     <img class="icon" id="icon" src="cloudy.png" alt="">
-    <span class="weather-text" id="weatherText">NYC --°F</span>
+    <span class="weather-text" id="weatherText">WV --°F</span>
   </main>
 
 <script>
@@ -101,7 +101,7 @@
       const temp = Math.round(data.current.temperature_2m);
       let type = weatherType(data.current.weather_code);
 
-      // Switch clear-day to clear-night during nighttime in NYC.
+      // Switch clear-day to clear-night during nighttime in WV.
       if (type === "sun") {
         const hour = Number(new Intl.DateTimeFormat("en-US", {
           hour: "numeric",
@@ -112,9 +112,9 @@
       }
 
       setIcon(type);
-      textEl.textContent = `NYC ${temp}°F`;
+      textEl.textContent = `WV ${temp}°F`;
     } catch {
-      textEl.textContent = "NYC --°F";
+      textEl.textContent = "WV --°F";
       setIcon("cloud");
     }
   }
